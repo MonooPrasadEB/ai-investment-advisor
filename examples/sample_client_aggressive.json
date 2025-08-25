@@ -1,0 +1,42 @@
+{
+  "personal_info": {
+    "age": 28,
+    "annual_income": 120000,
+    "net_worth": 85000,
+    "marital_status": "single", 
+    "dependents": 0,
+    "employment_status": "employed",
+    "occupation": "investment_banker"
+  },
+  "investment_profile": {
+    "investment_experience": "advanced",
+    "risk_tolerance": "aggressive",
+    "time_horizon": 35,
+    "primary_goal": "wealth_building",
+    "secondary_goals": ["early_retirement"],
+    "liquidity_needs": "low"
+  },
+  "financial_situation": {
+    "emergency_fund_months": 3,
+    "debt_to_income_ratio": 0.15,
+    "monthly_savings_rate": 0.25,
+    "current_retirement_savings": 45000,
+    "other_investments": 25000
+  },
+  "preferences": {
+    "esg_investing": false,
+    "sector_preferences": ["technology", "growth_stocks", "emerging_markets"],
+    "sector_restrictions": [],
+    "international_exposure": true,
+    "alternative_investments": true
+  },
+  "risk_assessment": {
+    "risk_comfort_level": 9,
+    "volatility_tolerance": 9,
+    "loss_tolerance_percent": 30,
+    "previous_investment_losses": true,
+    "reaction_to_market_decline": "buy_more"
+  },
+  "notes": "Young professional with high income and long time horizon. Seeking maximum growth potential.",
+  "last_updated": "2024-01-15T09:00:00Z"
+}

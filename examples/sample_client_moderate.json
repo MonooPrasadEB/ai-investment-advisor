@@ -1,0 +1,42 @@
+{
+  "personal_info": {
+    "age": 35,
+    "annual_income": 95000,
+    "net_worth": 275000,
+    "marital_status": "married",
+    "dependents": 1,
+    "employment_status": "employed",
+    "occupation": "software_engineer"
+  },
+  "investment_profile": {
+    "investment_experience": "intermediate",
+    "risk_tolerance": "moderate",
+    "time_horizon": 25,
+    "primary_goal": "wealth_building",
+    "secondary_goals": ["retirement", "education_fund"],
+    "liquidity_needs": "medium"
+  },
+  "financial_situation": {
+    "emergency_fund_months": 6,
+    "debt_to_income_ratio": 0.25,
+    "monthly_savings_rate": 0.15,
+    "current_retirement_savings": 125000,
+    "other_investments": 50000
+  },
+  "preferences": {
+    "esg_investing": false,
+    "sector_preferences": ["technology", "healthcare"],
+    "sector_restrictions": ["tobacco", "weapons"],
+    "international_exposure": true,
+    "alternative_investments": false
+  },
+  "risk_assessment": {
+    "risk_comfort_level": 6,
+    "volatility_tolerance": 6,
+    "loss_tolerance_percent": 15,
+    "previous_investment_losses": true,
+    "reaction_to_market_decline": "hold_and_rebalance"
+  },
+  "notes": "Tech-savvy professional looking for balanced growth with some stability. Comfortable with moderate volatility.",
+  "last_updated": "2024-01-15T09:00:00Z"
+}

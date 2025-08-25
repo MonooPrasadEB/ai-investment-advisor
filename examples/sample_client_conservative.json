@@ -1,0 +1,42 @@
+{
+  "personal_info": {
+    "age": 58,
+    "annual_income": 85000,
+    "net_worth": 650000,
+    "marital_status": "married",
+    "dependents": 0,
+    "employment_status": "employed",
+    "occupation": "teacher"
+  },
+  "investment_profile": {
+    "investment_experience": "intermediate",
+    "risk_tolerance": "conservative",
+    "time_horizon": 12,
+    "primary_goal": "capital_preservation",
+    "secondary_goals": ["retirement", "income_generation"],
+    "liquidity_needs": "high"
+  },
+  "financial_situation": {
+    "emergency_fund_months": 12,
+    "debt_to_income_ratio": 0.10,
+    "monthly_savings_rate": 0.20,
+    "current_retirement_savings": 450000,
+    "other_investments": 150000
+  },
+  "preferences": {
+    "esg_investing": true,
+    "sector_preferences": ["utilities", "consumer_staples", "healthcare"],
+    "sector_restrictions": ["technology", "biotech", "crypto"],
+    "international_exposure": false,
+    "alternative_investments": false
+  },
+  "risk_assessment": {
+    "risk_comfort_level": 3,
+    "volatility_tolerance": 2,
+    "loss_tolerance_percent": 8,
+    "previous_investment_losses": false,
+    "reaction_to_market_decline": "sell_some"
+  },
+  "notes": "Pre-retirement individual focused on capital preservation with steady income generation.",
+  "last_updated": "2024-01-15T09:00:00Z"
+}

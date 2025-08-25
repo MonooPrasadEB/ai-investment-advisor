@@ -1,0 +1,71 @@
+{
+  "total_value": 275000,
+  "last_updated": "2024-01-15T10:30:00Z",
+  "assets": [
+    {
+      "symbol": "AAPL",
+      "name": "Apple Inc.",
+      "quantity": 150,
+      "current_price": 193.50,
+      "allocation": 20.5,
+      "sector": "Technology",
+      "asset_type": "stock"
+    },
+    {
+      "symbol": "MSFT", 
+      "name": "Microsoft Corporation",
+      "quantity": 75,
+      "current_price": 417.10,
+      "allocation": 18.2,
+      "sector": "Technology",
+      "asset_type": "stock"
+    },
+    {
+      "symbol": "GOOGL",
+      "name": "Alphabet Inc.",
+      "quantity": 80,
+      "current_price": 175.20,
+      "allocation": 12.8,
+      "sector": "Technology", 
+      "asset_type": "stock"
+    },
+    {
+      "symbol": "TSLA",
+      "name": "Tesla Inc.", 
+      "quantity": 45,
+      "current_price": 248.42,
+      "allocation": 9.5,
+      "sector": "Consumer Cyclical",
+      "asset_type": "stock"
+    },
+    {
+      "symbol": "SPY",
+      "name": "SPDR S&P 500 ETF Trust",
+      "quantity": 200,
+      "current_price": 502.43,
+      "allocation": 25.0,
+      "sector": "Diversified",
+      "asset_type": "etf"
+    },
+    {
+      "symbol": "BND",
+      "name": "Vanguard Total Bond Market ETF", 
+      "quantity": 300,
+      "current_price": 72.15,
+      "allocation": 10.0,
+      "sector": "Fixed Income",
+      "asset_type": "bond"
+    },
+    {
+      "symbol": "VTI",
+      "name": "Vanguard Total Stock Market ETF",
+      "quantity": 25,
+      "current_price": 268.89,
+      "allocation": 4.0,
+      "sector": "Diversified",
+      "asset_type": "etf"
+    }
+  ],
+  "portfolio_notes": "Diversified growth portfolio with tech concentration",
+  "rebalancing_frequency": "quarterly"
+}

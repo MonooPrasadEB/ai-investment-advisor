@@ -682,7 +682,8 @@ Format your response as a clear, professional trade execution analysis.
         request: str, 
         client_profile: Optional[Dict] = None,
         portfolio_data: Optional[Dict] = None,
-        session_id: Optional[str] = None
+        session_id: Optional[str] = None,
+        conversation_history: Optional[List[BaseMessage]] = None
     ) -> Dict:
         """
         Process a client request through the multi-agent workflow.
@@ -692,14 +693,23 @@ Format your response as a clear, professional trade execution analysis.
             client_profile: Client demographic and preference information
             portfolio_data: Current portfolio holdings and data
             session_id: Session identifier for conversation continuity
+            conversation_history: Previous messages in the conversation for context
             
         Returns:
-            Dictionary containing the complete workflow results
+            Dictionary containing the complete workflow results including updated conversation history
         """
         try:
-            # Initialize state
+            # Build complete message history including previous conversation
+            messages = []
+            if conversation_history:
+                messages.extend(conversation_history)
+            
+            # Add the current request
+            messages.append(HumanMessage(content=request))
+            
+            # Initialize state with full conversation context
             initial_state = InvestmentAdvisorState(
-                messages=[HumanMessage(content=request)],
+                messages=messages,
                 client_profile=client_profile or {},
                 portfolio_data=portfolio_data or {},
                 current_task=None,
@@ -716,22 +726,18 @@ Format your response as a clear, professional trade execution analysis.
             # Run the workflow
             final_state = self.workflow.invoke(initial_state)
             
-            # Extract final response
+            # Extract final response and conversation history
             final_messages = final_state["messages"]
             final_response = final_messages[-1].content if final_messages else "No response generated"
             
             return {
                 "response": final_response,
-                "session_id": final_state["session_id"],
-                "workflow_complete": final_state.get("workflow_complete", False),
-                "analysis_results": final_state.get("analysis_results"),
-                "trade_recommendations": final_state.get("trade_recommendations"),
-                "compliance_approved": final_state.get("compliance_approval", False),
-                "requires_user_approval": final_state.get("requires_approval", False),
-                "message_history": [
-                    {"role": "human" if isinstance(msg, HumanMessage) else "ai", "content": msg.content}
-                    for msg in final_messages
-                ]
+                "conversation_history": final_messages,
+                "session_id": final_state.get("session_id"),
+                "requires_approval": final_state.get("requires_approval", False),
+                "trade_recommendations": final_state.get("trade_recommendations", []),
+                "analysis_results": final_state.get("analysis_results", {}),
+                "workflow_complete": final_state.get("workflow_complete", False)
             }
             
         except Exception as e:

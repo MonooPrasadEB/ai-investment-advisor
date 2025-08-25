@@ -37,6 +37,7 @@ class InvestmentAdvisorCLI:
         self.supervisor = investment_advisor_supervisor
         self.session_id = None
         self.client_profile = None
+        self.conversation_history = []  # Track full conversation for context
         
     def run(self):
         """Main CLI entry point."""
@@ -219,14 +220,19 @@ Examples:
                         console.print("❌ Failed to load portfolio file")
                     continue
                 
-                # Process the request
+                # Process the request with full conversation history
                 with console.status("[bold green]AI Advisor is thinking..."):
                     result = self.supervisor.process_client_request(
                         request=user_input,
                         client_profile=self.client_profile,
                         portfolio_data=self.portfolio_data,
-                        session_id=self.session_id
+                        session_id=self.session_id,
+                        conversation_history=self.conversation_history
                     )
+                
+                # Update conversation history with the complete exchange
+                if "conversation_history" in result:
+                    self.conversation_history = result["conversation_history"]
                 
                 # Display response
                 self._display_interactive_response(result)

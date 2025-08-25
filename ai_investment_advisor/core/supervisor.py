@@ -111,6 +111,7 @@ class InvestmentAdvisorSupervisor:
         workflow.add_node("trade_execution", self._trade_execution_node)
         workflow.add_node("compliance_review", self._compliance_review_node)
         workflow.add_node("client_communication", self._client_communication_node)
+        # workflow.add_node("data_lookup", self._data_lookup_node)  # Direct portfolio data queries
         
         # Add edges with routing logic
         workflow.set_entry_point("supervisor")
@@ -120,9 +121,10 @@ class InvestmentAdvisorSupervisor:
             self._route_next_action,
             {
                 "portfolio_analysis": "portfolio_analysis",
-                "trade_execution": "trade_execution",
+                "trade_execution": "trade_execution", 
                 "compliance_review": "compliance_review",
                 "client_communication": "client_communication",
+                # "data_lookup": "data_lookup",
                 "end": END
             }
         )
@@ -132,6 +134,7 @@ class InvestmentAdvisorSupervisor:
         workflow.add_edge("trade_execution", "supervisor")
         workflow.add_edge("compliance_review", "supervisor")
         workflow.add_edge("client_communication", "supervisor")
+        # workflow.add_edge("data_lookup", "end")  # Direct data queries end immediately
         
         return workflow.compile()
     
@@ -150,7 +153,7 @@ class InvestmentAdvisorSupervisor:
         
         last_message = messages[-1]
         
-        # Use LLM-powered intelligent routing
+        # Hybrid routing: Deterministic data queries vs LLM analysis
         if isinstance(last_message, HumanMessage):
             content = last_message.content.lower()
             
@@ -158,8 +161,14 @@ class InvestmentAdvisorSupervisor:
             if "approve" in content and state.get("requires_approval"):
                 state["current_task"] = "compliance_review"
                 state["next_agent"] = "compliance_review"
+            
+            # Check for deterministic data queries first
+            # elif self._is_data_query(content):
+            #     state["current_task"] = "data_lookup"
+            #     state["next_agent"] = "data_lookup"
+            
             else:
-                # Use LLM for other routing decisions
+                # Use LLM for analysis/strategy questions
                 routing_decision = self._get_llm_routing_decision(
                     last_message.content,
                     state.get("portfolio_data"),
@@ -180,6 +189,71 @@ class InvestmentAdvisorSupervisor:
                 state["next_agent"] = "end"
         
         return state
+    
+    def _is_data_query(self, content: str) -> bool:
+        """
+        Determine if query is asking for deterministic portfolio data vs analysis.
+        
+        Data queries should go directly to portfolio lookup (fast, accurate).
+        Analysis queries should go to LLM (intelligent reasoning).
+        """
+        
+        # Patterns for deterministic data queries
+        data_query_patterns = [
+            # Holdings and shares
+            r'\bhow many.*shares?\b',
+            r'\bnumber of.*shares?\b', 
+            r'\bshares.*do i (own|have)\b',
+            r'\blist.*holdings?\b',
+            r'\bwhat.*do i own\b',
+            r'\bshow.*portfolio\b',
+            r'\bcurrent.*holdings?\b',
+            r'\bmy.*positions?\b',
+            
+            # Cash and balances
+            r'\bcash.*balance\b',
+            r'\bavailable.*cash\b',
+            r'\bmoney.*do i have\b',
+            r'\bliquid.*funds?\b',
+            
+            # Portfolio values
+            r'\btotal.*value\b',
+            r'\bportfolio.*worth\b',
+            r'\bnet.*worth\b',
+            r'\bassets?\b.*value\b',
+            
+            # Specific stock data
+            r'\bprice.*of.*\w+\b',
+            r'\bcurrent.*price\b',
+            r'\bmarket.*value.*of\b',
+            r'\b\w+.*shares?\b.*worth\b'
+        ]
+        
+        import re
+        
+        # Check if it matches any data query pattern
+        for pattern in data_query_patterns:
+            if re.search(pattern, content):
+                return True
+        
+        # Additional simple keyword checks
+        data_keywords = [
+            'holdings', 'shares', 'balance', 'cash', 
+            'positions', 'total value', 'portfolio value',
+            'how much', 'how many', 'what do i own'
+        ]
+        
+        # Must not contain analysis keywords (to avoid false positives)
+        analysis_keywords = [
+            'should', 'recommend', 'advice', 'think', 'opinion', 
+            'analysis', 'strategy', 'buy', 'sell', 'rebalance'
+        ]
+        
+        has_data_keyword = any(keyword in content for keyword in data_keywords)
+        has_analysis_keyword = any(keyword in content for keyword in analysis_keywords)
+        
+        # It's a data query if it has data keywords but no analysis keywords
+        return has_data_keyword and not has_analysis_keyword
     
     def _get_llm_routing_decision(self, user_message: str, portfolio_data: Optional[Dict], client_profile: Optional[Dict]) -> Dict[str, str]:
         """
@@ -657,6 +731,120 @@ Format your response as a clear, professional trade execution analysis.
         
         return state
     
+    def _data_lookup_node(self, state: InvestmentAdvisorState) -> InvestmentAdvisorState:
+        """Handle deterministic portfolio data queries without LLM processing."""
+        
+        messages = state["messages"]
+        last_message = messages[-1] if messages else None
+        portfolio_data = state.get("portfolio_data", {})
+        
+        if not last_message:
+            response_content = "No query provided for data lookup."
+        elif not portfolio_data or not portfolio_data.get('holdings'):
+            response_content = "No portfolio data available. Please load a portfolio file first using the 'portfolio' command."
+        else:
+            response_content = self._process_data_query(last_message.content, portfolio_data)
+        
+        ai_response = AIMessage(content=response_content)
+        state["messages"] = messages + [ai_response]
+        state["workflow_complete"] = True
+        
+        return state
+    
+    def _process_data_query(self, query: str, portfolio_data: Dict) -> str:
+        """Process deterministic data queries and return factual portfolio information."""
+        
+        query_lower = query.lower()
+        holdings = portfolio_data.get('holdings', [])
+        
+        if not holdings:
+            return "Your portfolio is currently empty."
+        
+        # Calculate portfolio metrics
+        total_value = sum(h.get('quantity', 0) * h.get('current_price', 0) for h in holdings)
+        cash_balance = portfolio_data.get('cash_balance', 0)
+        
+        # Parse and respond to specific queries
+        
+        # Holdings list queries
+        if any(phrase in query_lower for phrase in ['list holdings', 'show portfolio', 'what do i own', 'current holdings', 'my positions']):
+            response = f"**Current Portfolio Holdings:**\n\n"
+            for holding in holdings:
+                symbol = holding.get('symbol', 'Unknown')
+                quantity = holding.get('quantity', 0)
+                current_price = holding.get('current_price', 0)
+                market_value = quantity * current_price
+                allocation = (market_value / total_value * 100) if total_value > 0 else 0
+                
+                response += f"• **{symbol}**: {quantity:,} shares @ ${current_price:.2f} = ${market_value:,.2f} ({allocation:.1f}%)\n"
+            
+            response += f"\n**Total Portfolio Value:** ${total_value:,.2f}"
+            if cash_balance > 0:
+                response += f"\n**Cash Balance:** ${cash_balance:,.2f}"
+            return response
+        
+        # Share count queries
+        if 'how many shares' in query_lower or 'number of shares' in query_lower:
+            # Try to extract stock symbol from query
+            import re
+            symbols = [h.get('symbol', '').upper() for h in holdings]
+            found_symbol = None
+            
+            for symbol in symbols:
+                if symbol.lower() in query_lower:
+                    found_symbol = symbol
+                    break
+            
+            if found_symbol:
+                holding = next((h for h in holdings if h.get('symbol', '').upper() == found_symbol), None)
+                if holding:
+                    quantity = holding.get('quantity', 0)
+                    return f"You own **{quantity:,} shares** of {found_symbol}."
+            else:
+                # Show all share counts
+                response = "**Share counts for all holdings:**\n\n"
+                for holding in holdings:
+                    symbol = holding.get('symbol', 'Unknown')
+                    quantity = holding.get('quantity', 0)
+                    response += f"• **{symbol}**: {quantity:,} shares\n"
+                return response
+        
+        # Total value queries
+        if any(phrase in query_lower for phrase in ['total value', 'portfolio worth', 'net worth', 'portfolio value']):
+            response = f"**Total Portfolio Value:** ${total_value:,.2f}"
+            if cash_balance > 0:
+                response += f"\n**Cash Balance:** ${cash_balance:,.2f}"
+                response += f"\n**Total Account Value:** ${total_value + cash_balance:,.2f}"
+            return response
+        
+        # Cash balance queries
+        if any(phrase in query_lower for phrase in ['cash balance', 'available cash', 'money do i have', 'liquid funds']):
+            return f"**Cash Balance:** ${cash_balance:,.2f}"
+        
+        # Specific stock price/value queries
+        import re
+        price_match = re.search(r'\b(price|value).*?([A-Z]{1,5})\b', query.upper())
+        if price_match:
+            symbol = price_match.group(2)
+            holding = next((h for h in holdings if h.get('symbol', '').upper() == symbol), None)
+            if holding:
+                current_price = holding.get('current_price', 0)
+                quantity = holding.get('quantity', 0)
+                market_value = quantity * current_price
+                return f"**{symbol}**: ${current_price:.2f} per share (You own {quantity:,} shares = ${market_value:,.2f})"
+        
+        # Fallback - show basic portfolio summary
+        return f"""**Portfolio Summary:**
+
+• **Total Holdings:** {len(holdings)} positions
+• **Total Value:** ${total_value:,.2f}
+• **Cash Balance:** ${cash_balance:,.2f}
+• **Largest Position:** {max(holdings, key=lambda h: h.get('quantity', 0) * h.get('current_price', 0)).get('symbol', 'N/A') if holdings else 'N/A'}
+
+For detailed holdings, ask: "list my holdings"
+For specific share counts, ask: "how many shares of [SYMBOL]"
+"""
+    
     def _route_next_action(
         self, state: InvestmentAdvisorState
     ) -> Literal["portfolio_analysis", "trade_execution", "compliance_review", "client_communication", "end"]:
@@ -674,6 +862,8 @@ Format your response as a clear, professional trade execution analysis.
             return "compliance_review"
         elif next_agent == "client_communication":
             return "client_communication"
+        # elif next_agent == "data_lookup":
+        #     return "data_lookup"
         else:
             return "end"
     

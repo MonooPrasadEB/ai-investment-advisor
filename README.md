@@ -242,57 +242,7 @@ This project demonstrates:
 - **Educational Impact**: Makes sophisticated investment management accessible
 
 
-## Architecture
-graph TB
-    subgraph "LangChain Components"
-        A1["ChatOpenAI<br/>(GPT-4 Interface)"]
-        A2["ChatPromptTemplate<br/>(Structured Prompts)"]
-        A3["BaseTool<br/>(Custom Tools)"]
-        A4["Messages<br/>(HumanMessage, AIMessage)"]
-    end
-    
-    subgraph "LangGraph Orchestration"
-        B1["StateGraph<br/>(Workflow Manager)"]
-        B2["create_react_agent<br/>(Agent Factory)"]
-        B3["InvestmentAdvisorState<br/>(Shared State)"]
-        B4["Workflow Nodes<br/>(supervisor, portfolio_analysis, etc.)"]
-    end
-    
-    subgraph "Your Custom Agents"
-        C1["MultiTaskAgent<br/>(Portfolio Analysis)"]
-        C2["ExecutionAgent<br/>(Trade Execution)"]
-        C3["ComplianceReviewer<br/>(Regulatory Checks)"]
-    end
-    
-    subgraph "Custom Tools"
-        D1["portfolio_analysis_tool"]
-        D2["risk_assessment_tool"]
-        D3["trade_compliance_tool"]
-        D4["market_data_tool"]
-    end
-    
-    A1 --> B2
-    A2 --> C1
-    A2 --> C2
-    A2 --> C3
-    A3 --> D1
-    A3 --> D2
-    A3 --> D3
-    A3 --> D4
-    
-    B2 --> C1
-    B2 --> C2
-    B2 --> C3
-    
-    C1 --> D1
-    C1 --> D2
-    C1 --> D4
-    C2 --> D3
-    C3 --> D3
-    
-    B1 --> B4
-    B3 --> B4
-    A4 --> B3
+
 
 ## 📝 License
 

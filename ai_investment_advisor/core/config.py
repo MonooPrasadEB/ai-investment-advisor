@@ -17,9 +17,9 @@ class Config(BaseSettings):
     anthropic_api_key: Optional[str] = Field(None, env="ANTHROPIC_API_KEY")
     
     # Default model settings
-    default_model: str = Field("gpt-4", env="DEFAULT_MODEL")
-    temperature: float = Field(0.1, env="TEMPERATURE")
-    max_tokens: int = Field(2000, env="MAX_TOKENS")
+    default_model: str = Field("gpt-3.5-turbo", env="DEFAULT_MODEL")  # Faster model
+    temperature: float = Field(0.0, env="TEMPERATURE")  # More deterministic
+    max_tokens: int = Field(800, env="MAX_TOKENS")  # Lower latency
     
     # Financial Data APIs
     alpha_vantage_api_key: Optional[str] = Field(None, env="ALPHA_VANTAGE_API_KEY")

@@ -53,7 +53,7 @@ class TradeSimulator:
         config = Config.get_instance()
         self.llm = ChatOpenAI(
             model=config.default_model,
-            temperature=0.3,  # Slightly higher for creative rebalancing ideas
+            temperature=0.1,  # Lower for more consistent trade analysis
             api_key=config.openai_api_key
         )
     

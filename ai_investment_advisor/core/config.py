@@ -1,5 +1,7 @@
 """Configuration management for AI Investment Advisor."""
 
+# Test comment: Verifying GitHub workflow - Test #2
+
 import os
 from typing import Optional
 from pydantic import Field
